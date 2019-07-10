@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/libgo/cron/lock"
-	_ "github.com/libgo/cron/lock/mysql"
 	"github.com/libgo/logx"
 )
 

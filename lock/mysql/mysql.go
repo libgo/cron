@@ -6,7 +6,6 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/libgo/cron/lock"
-	"github.com/libgo/logx"
 	"github.com/libgo/mysqlx"
 )
 
