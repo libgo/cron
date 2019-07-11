@@ -38,10 +38,10 @@ func main() {
 		logx.Errorf("set locker error: %s", err.Error())
 	}
 
-	cron.Add("0 20 21 0 0 0", &PrintJob{s: s})
-	cron.Add("0 21 21 0 0 0", &PrintJob{s: s})
-	cron.Add("0 22 21 0 0 0", &PrintJob{s: s})
-	cron.Add("0 23 21 0 0 0", &PrintJob{s: s})
+	cron.Add("0 22 16 0 0 0", &PrintJob{s: s})
+	cron.Add("0 33 17 0 0 0", &PrintJob{s: s})
+	cron.Add("0 44 17 0 0 0", &PrintJob{s: s})
+	cron.Add("0 55 17 0 0 0", &PrintJob{s: s})
 	// cron.Add("0 36 20 0 0 4", &PrintJob{s: s})
 	// cron.Add("0 36 20 12 0 0", &PrintJob{s: s})
 	// cron.Add("0 36 20 12 9 0", &PrintJob{s: s})
