@@ -33,19 +33,18 @@ func init() {
 func main() {
 	flag.Parse()
 
-	err := cron.SetLocker("mysql", "root:ddg1208@tcp(192.168.10.191:3306)/dolphin")
+	err := cron.Locker("mysql", "root:passWORD@tcp(192.168.10.191:3306)/dolphin")
 	if err != nil {
-		logx.Errorf("set locker error: %s", err.Error())
+		logx.Errorf("init locker error: %s", err.Error())
 	}
 
-	cron.Add("0 20 21 0 0 0", &PrintJob{s: s})
-	cron.Add("0 21 21 0 0 0", &PrintJob{s: s})
-	cron.Add("0 22 21 0 0 0", &PrintJob{s: s})
-	cron.Add("0 23 21 0 0 0", &PrintJob{s: s})
-	// cron.Add("0 36 20 0 0 4", &PrintJob{s: s})
-	// cron.Add("0 36 20 12 0 0", &PrintJob{s: s})
-	// cron.Add("0 36 20 12 9 0", &PrintJob{s: s})
-	// cron.Add("0 36 20 12 5 0", &PrintJob{s: "tesing runing"})
+	cron.Add("0 24 10 0 0 0", &PrintJob{s: s})
+	cron.Add("0 25 10 0 0 0", &PrintJob{s: s})
+	cron.Add("0 26 10 0 0 0", &PrintJob{s: s})
+	cron.Add("0 27 10 0 0 0", &PrintJob{s: s})
+	cron.Add("0 28 10 0 0 0", &PrintJob{s: s})
+	cron.Add("0 29 10 0 0 0", &PrintJob{s: s})
+	cron.Add("0 30 10 0 0 0", &PrintJob{s: s})
 	cron.Run()
 
 	c := make(chan bool)

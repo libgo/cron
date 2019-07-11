@@ -12,8 +12,7 @@ import (
 // Job
 type Job interface {
 	Name() string
-	// Run must > 2 second
-	Run()
+	Run() // For job, the run routine should > 2s, add a time.Sleep(2 * time.Second) is a good idea.
 }
 
 type entry struct {
@@ -32,11 +31,11 @@ var (
 	locker  lock.Locker = nil
 )
 
-// SetLock config lock target
+// Locker init lock container
 // n is the name of lock service: "mysql", "etcd", "redis"
-// d is the connect string to the service
-func SetLocker(n string, d string) error {
-	l, err := lock.Open(n, d)
+// uri is the connect string to the service
+func Locker(n string, uri string) error {
+	l, err := lock.Open(n, uri)
 	if err != nil {
 		return err
 	}
@@ -46,6 +45,18 @@ func SetLocker(n string, d string) error {
 }
 
 // Add job to crontab
+// i is input timing string, format should be "second minute hour day month dow"
+// second = [0..59]
+// minute = [0..59]
+// hour = [0..23]
+// day = [1..31]   0 means ignore
+// month = [1..12]   0 means ignore
+// dow = [1..7]   0 means ignore, 7 is sunday
+// only support 4 patterns
+// daily: 2 10 3 0 0 0       "3:10:02"
+// monthly: 2 10 3 1 0 0     "1st 3:10:02"
+// yearly: 2 10 3 1 2 0      "Feb 1st 3:10:02"
+// weekly: 2 10 3 0 0 2      "Tue 3:10:02"
 func Add(i string, j Job) error {
 	if running {
 		return ErrRunning
@@ -76,6 +87,7 @@ func Run() error {
 
 		go func() {
 			tm := time.NewTimer(s.Next().Sub(time.Now()))
+			logx.Infof("cron: schedule job '%s' at %s", j.Name(), s.Next().String())
 			for {
 				select {
 				case <-tm.C:
@@ -86,6 +98,7 @@ func Run() error {
 					}
 
 					tm.Reset(s.Next().Sub(time.Now()))
+					logx.Infof("cron: schedule job '%s' at %s", j.Name(), s.Next().String())
 				}
 			}
 		}()
@@ -93,7 +106,7 @@ func Run() error {
 	return nil
 }
 
-// run with recovery
+// run with recovery. For cron job, should not break the service.
 func run(j Job) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -103,5 +116,6 @@ func run(j Job) {
 			logx.Errorf("cron: panic running job: %v\n%s", r, buf)
 		}
 	}()
+
 	j.Run()
 }
