@@ -17,15 +17,6 @@ type Mysql struct {
 	db *sqlx.DB
 }
 
-func conf(uri string) mysqlx.Conf {
-	return mysqlx.Conf{
-		DSN:             uri,
-		MaxOpenConns:    16,
-		MaxIdleConns:    8,
-		ConnMaxLifetime: time.Minute * 15,
-	}
-}
-
 // Open a new mysql locker instance
 func (m *Mysql) Open(uri string) lock.Locker {
 	db := mysqlx.Register("db", mysqlx.Conf{
