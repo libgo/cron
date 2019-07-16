@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 	"time"
 
 	"github.com/libgo/cron"
@@ -19,15 +20,17 @@ func (j *PrintJob) Name() string {
 
 func (j *PrintJob) Run() {
 	logx.Infof("printing %s", j.s)
-	time.Sleep(10 * time.Second)
+	time.Sleep(3 * time.Second)
 }
 
 var (
+	i string
 	s string
 )
 
 func init() {
-	flag.StringVar(&s, "d", "dummy string", "dummy string")
+	flag.StringVar(&i, "i", "0 * * * * *", "timing spec")
+	flag.StringVar(&s, "s", "dummy", "namespace")
 }
 
 func main() {
@@ -36,15 +39,14 @@ func main() {
 	err := cron.Locker("mysql", "root:passWORD@tcp(192.168.10.191:3306)/dolphin")
 	if err != nil {
 		logx.Errorf("init locker error: %s", err.Error())
+		os.Exit(1)
 	}
 
-	cron.Add("0 24 10 0 0 0", &PrintJob{s: s})
-	cron.Add("0 25 10 0 0 0", &PrintJob{s: s})
-	cron.Add("0 26 10 0 0 0", &PrintJob{s: s})
-	cron.Add("0 27 10 0 0 0", &PrintJob{s: s})
-	cron.Add("0 28 10 0 0 0", &PrintJob{s: s})
-	cron.Add("0 29 10 0 0 0", &PrintJob{s: s})
-	cron.Add("0 30 10 0 0 0", &PrintJob{s: s})
+	err = cron.Add(i, &PrintJob{s: s + " job"})
+	if err != nil {
+		logx.Errorf("add cron job error: %s", err.Error())
+		os.Exit(1)
+	}
 	cron.Run()
 
 	c := make(chan bool)

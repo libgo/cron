@@ -16,7 +16,7 @@ type Job interface {
 }
 
 type entry struct {
-	schedule Schedule
+	schedule *Schedule
 	job      Job
 }
 
@@ -46,17 +46,12 @@ func Locker(n string, uri string) error {
 
 // Add job to crontab
 // i is input timing string, format should be "second minute hour day month dow"
-// second = [0..59]
-// minute = [0..59]
-// hour = [0..23]
-// day = [1..31]   0 means ignore
-// month = [1..12]   0 means ignore
-// dow = [1..7]   0 means ignore, 7 is sunday
-// only support 4 patterns
-// daily: 2 10 3 0 0 0       "3:10:02"
-// monthly: 2 10 3 1 0 0     "1st 3:10:02"
-// yearly: 2 10 3 1 2 0      "Feb 1st 3:10:02"
-// weekly: 2 10 3 0 0 2      "Tue 3:10:02"
+// minutely: 2 * * * * *     "*:*:02"
+// hourly: 2 10 * * * *      "*:10:02"
+// daily: 2 10 3 * * *       "3:10:02"
+// monthly: 2 10 3 1 * *     "1st 3:10:02"
+// yearly: 2 10 3 1 2 *      "Feb 1st 3:10:02"
+// weekly: 2 10 3 * * 2      "Tue 3:10:02"
 func Add(i string, j Job) error {
 	if running {
 		return ErrRunning
@@ -67,7 +62,7 @@ func Add(i string, j Job) error {
 		return err
 	}
 
-	entries = append(entries, entry{schedule: *s, job: j})
+	entries = append(entries, entry{schedule: s, job: j})
 	return nil
 }
 

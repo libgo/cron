@@ -6,6 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/libgo/cron/lock"
+	"github.com/libgo/logx"
 	"github.com/libgo/mysqlx"
 )
 
@@ -21,9 +22,9 @@ type Mysql struct {
 func (m *Mysql) Open(uri string) lock.Locker {
 	db := mysqlx.Register("db", mysqlx.Conf{
 		DSN:             uri,
-		MaxOpenConns:    16,
-		MaxIdleConns:    8,
-		ConnMaxLifetime: time.Minute * 15,
+		MaxOpenConns:    2,
+		MaxIdleConns:    1,
+		ConnMaxLifetime: time.Minute * 5,
 	})
 
 	return &Mysql{db: db}
@@ -35,11 +36,12 @@ func (m *Mysql) Lock(n string) error {
 	var success bool
 
 	if err := m.db.QueryRow(query).Scan(&success); err != nil {
-		return fmt.Errorf("lock job %s error: %s", n, err.Error())
+		logx.Errorf("lock job %s error at mysql db: %s", n, err.Error())
+		return lock.ErrLock
 	}
 
 	if !success {
-		return fmt.Errorf("lock job %s error", n)
+		return lock.ErrLock
 	}
 
 	return nil
@@ -49,7 +51,8 @@ func (m *Mysql) Lock(n string) error {
 func (m *Mysql) Unlock(n string) error {
 	query := fmt.Sprintf(`SELECT RELEASE_LOCK("job_lock_%s")`, n)
 	if _, err := m.db.Exec(query); err != nil {
-		return fmt.Errorf("unlock job %s error: %s", n, err.Error())
+		logx.Errorf("unlock job %s error at mysql db: %s", n, err.Error())
+		return lock.ErrUnlock
 	}
 	return nil
 }

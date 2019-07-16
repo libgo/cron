@@ -4,6 +4,8 @@ import "fmt"
 
 var (
 	ErrNoLocker = fmt.Errorf("invalid locker")
+	ErrLock     = fmt.Errorf("lock error")
+	ErrUnlock   = fmt.Errorf("unlock error")
 	lockers     = make(map[string]Locker)
 )
 
