@@ -7,6 +7,7 @@ import (
 
 	"github.com/libgo/cron"
 	_ "github.com/libgo/cron/lock/mysql"
+	_ "github.com/libgo/cron/lock/null"
 	"github.com/libgo/logx"
 )
 
@@ -26,17 +27,21 @@ func (j *PrintJob) Run() {
 var (
 	i string
 	s string
+	l string
+	u string
 )
 
 func init() {
 	flag.StringVar(&i, "i", "0 * * * * *", "timing spec")
 	flag.StringVar(&s, "s", "dummy", "namespace")
+	flag.StringVar(&l, "l", "mysql", "locker, now support mysql, null")
+	flag.StringVar(&u, "u", "root:passWORD@tcp(192.168.10.191:3306)/dolphin", "uri to the locker service")
 }
 
 func main() {
 	flag.Parse()
 
-	err := cron.Locker("mysql", "root:passWORD@tcp(192.168.10.191:3306)/dolphin")
+	err := cron.Locker(l, u)
 	if err != nil {
 		logx.Errorf("init locker error: %s", err.Error())
 		os.Exit(1)
