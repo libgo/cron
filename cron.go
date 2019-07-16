@@ -31,6 +31,12 @@ var (
 	locker  lock.Locker = nil
 )
 
+const (
+	// job minimal duration, if less than this value, should sleep.
+	// this is to avoid time gap for different machine in micro service cluster.
+	minDuration time.Duration = 10 * time.Second
+)
+
 // Locker init lock container
 // n is the name of lock service: "mysql", "etcd", "redis"
 // uri is the connect string to the service
@@ -88,7 +94,15 @@ func Run() error {
 				case <-tm.C:
 					err := locker.Lock(j.Name())
 					if err == nil {
+						logx.Infof("cron: execute job '%s'", j.Name())
+
+						begin := time.Now()
 						run(j)
+						delta := time.Now().Sub(begin)
+						if delta < minDuration { // job execution less than minDuration, sleep
+							time.Sleep(minDuration - delta)
+						}
+
 						locker.Unlock(j.Name())
 					}
 
@@ -98,6 +112,7 @@ func Run() error {
 			}
 		}()
 	}
+	running = true
 	return nil
 }
 
