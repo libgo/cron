@@ -52,6 +52,7 @@ func main() {
 		logx.Errorf("add cron job error: %s", err.Error())
 		os.Exit(1)
 	}
+
 	cron.Run()
 
 	c := make(chan bool)
