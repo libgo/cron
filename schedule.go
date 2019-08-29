@@ -157,7 +157,7 @@ func Parse(i string) (*Schedule, error) {
 	}
 
 	// monthly
-	if s[monthly] == "*" {
+	if s[4] == "*" {
 		return &Schedule{monthly, second, minute, hour, day, 0, 0}, nil
 	}
 
