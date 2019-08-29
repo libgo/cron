@@ -8,6 +8,7 @@ import (
 	"github.com/libgo/cron"
 	_ "github.com/libgo/cron/lock/mysql"
 	_ "github.com/libgo/cron/lock/null"
+	_ "github.com/libgo/cron/lock/redis"
 	"github.com/libgo/logx"
 )
 
