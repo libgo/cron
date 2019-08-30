@@ -36,7 +36,7 @@ func (m *Mysql) Lock(n string) error {
 	var success bool
 
 	if err := m.db.QueryRow(query).Scan(&success); err != nil {
-		logx.Errorf("lock job %s error at mysql db: %s", n, err.Error())
+		logx.Errorf("cron: lock job %s error at mysql db: %s", n, err.Error())
 		return lock.ErrLock
 	}
 
@@ -51,8 +51,9 @@ func (m *Mysql) Lock(n string) error {
 func (m *Mysql) Unlock(n string) error {
 	query := fmt.Sprintf(`SELECT RELEASE_LOCK("job_lock_%s")`, n)
 	if _, err := m.db.Exec(query); err != nil {
-		logx.Errorf("unlock job %s error at mysql db: %s", n, err.Error())
+		logx.Errorf("cron: unlock job %s error at mysql db: %s", n, err.Error())
 		return lock.ErrUnlock
 	}
+
 	return nil
 }

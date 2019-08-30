@@ -35,8 +35,10 @@ var (
 func init() {
 	flag.StringVar(&i, "i", "0 * * * * *", "timing spec")
 	flag.StringVar(&s, "s", "dummy", "namespace")
-	flag.StringVar(&l, "l", "mysql", "locker, now support mysql, null")
-	flag.StringVar(&u, "u", "root:passWORD@tcp(192.168.10.191:3306)/dolphin", "uri to the locker service")
+	flag.StringVar(&l, "l", "mysql", "locker, now support mysql, redis, null")
+	flag.StringVar(&u, "u", "root:passWORD@tcp(192.168.10.191:3306)/dolphin", `uri to the locker service, now support redis and mysql.
+mysql pattern should like: 'root:passWORD@tcp(192.168.10.191:3306)/dolphin'
+redis pattern should like: 'redis://:passWORD@192.168.10.145:6379'`)
 }
 
 func main() {
