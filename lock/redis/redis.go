@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"time"
+
 	"github.com/go-redis/redis"
 	"github.com/libgo/cron/lock"
 	"github.com/libgo/logx"
@@ -28,7 +30,7 @@ func (m *Redis) Open(uri string) lock.Locker {
 
 // Lock with SetNX(n)
 func (m *Redis) Lock(n string) error {
-	success, err := m.client.SetNX("job_lock_"+n, "Lock", 0).Result()
+	success, err := m.client.SetNX("job_lock_"+n, "Lock", 30*time.Second).Result()
 	if err != nil {
 		logx.Errorf("cron: lock job %s error at redis: %s", n, err.Error())
 		return lock.ErrLock
@@ -41,18 +43,7 @@ func (m *Redis) Lock(n string) error {
 	return nil
 }
 
-// Unlock with Del key(n)
+// Unlock does nothing, because use expiration in Lock
 func (m *Redis) Unlock(n string) error {
-	d, err := m.client.Del("job_lock_" + n).Result()
-	if err != nil {
-		logx.Errorf("cron: unlock job %s error at redis: %s", n, err.Error())
-		return lock.ErrUnlock
-	}
-
-	if d == 0 {
-		logx.Errorf("cron: unlock job get wrong redis DEL return number")
-		return lock.ErrUnlock
-	}
-
 	return nil
 }
